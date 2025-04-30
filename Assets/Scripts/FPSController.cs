@@ -4,6 +4,7 @@ public class FPSController : MonoBehaviour
 {
     public float speed = 5f;
     public float mouseSensitivity = 2f;
+    public float touchSensitivity = 50f; // Sensitivity for touch controls
     public float jumpForce = 5f;
     public float gravity = -9.81f;
     
@@ -13,7 +14,7 @@ public class FPSController : MonoBehaviour
     
     // Crouch variables
     public float crouchSpeedMultiplier = 0.5f;
-    public float crouchHeight = 0.6f;  // Reduced crouch height for lower crouch
+    public float crouchHeight = 0.6f;
     public float crouchTransitionSpeed = 10f;
     private float originalHeight;
     private Vector3 originalCameraPosition;
@@ -25,6 +26,10 @@ public class FPSController : MonoBehaviour
     private Transform playerCamera;
     private float verticalSpeed = 0f;
     private float xRotation = 0f;
+    
+    // Reference to mobile controls
+    private MobileControls mobileControls;
+    private bool usingTouchControls = false;
 
     void Start()
     {
@@ -35,8 +40,18 @@ public class FPSController : MonoBehaviour
         targetHeight = originalHeight;
         originalCameraPosition = playerCamera.localPosition;
 
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
+        // Find mobile controls in scene if they exist
+        mobileControls = FindObjectOfType<MobileControls>();
+        
+        // Set cursor state for PC
+        if (!Application.isMobilePlatform)
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+        }
+        
+        // Detect if we're on mobile platform
+        usingTouchControls = Application.isMobilePlatform;
     }
 
     void Update()
@@ -49,7 +64,7 @@ public class FPSController : MonoBehaviour
 
     void HandleSprint()
     {
-        // Toggle sprint when Left Shift is pressed
+        // Keyboard sprint
         if (Input.GetKeyDown(KeyCode.LeftShift))
         {
             isSprinting = true;
@@ -58,58 +73,90 @@ public class FPSController : MonoBehaviour
         {
             isSprinting = false;
         }
+        
+        // Touch sprint
+        if (mobileControls != null && usingTouchControls)
+        {
+            isSprinting = mobileControls.IsSprinting();
+        }
     }
 
     void HandleCrouch()
     {
-        // // Toggle crouch when C or Left Control is pressed
-        // if (Input.GetKeyDown(KeyCode.C) || Input.GetKeyDown(KeyCode.LeftControl))
-        // {
-        //     isCrouching = !isCrouching;
-        //     targetHeight = isCrouching ? crouchHeight : originalHeight;
-        // }
-        //
-        // // Smoothly transition height
-        // currentHeight = Mathf.Lerp(currentHeight, targetHeight, crouchTransitionSpeed * Time.deltaTime);
-        //
-        // // Snap to target height if very close to complete the transition
-        // if (Mathf.Abs(currentHeight - targetHeight) < 0.01f)
-        // {
-        //     currentHeight = targetHeight;
-        // }
-        //
-        // // Update controller height and center
-        // controller.height = currentHeight;
-        // controller.center = new Vector3(0, currentHeight / 2, 0);
-        //
-        // // Check for obstacles when standing up
-        // if (!isCrouching && currentHeight < originalHeight)
-        // {
-        //     if (Physics.Raycast(transform.position, Vector3.up, originalHeight))
-        //     {
-        //         // Don't stand up if there's an obstacle above
-        //         currentHeight = controller.height;
-        //         targetHeight = currentHeight;
-        //         isCrouching = true;
-        //     }
-        // }
-        //
-        // // Calculate camera offset based on height difference
-        // float heightDifference = originalHeight - currentHeight;
-        // float cameraOffset = heightDifference / 2;
-        //
-        // // Update camera position
-        // playerCamera.localPosition = new Vector3(
-        //     originalCameraPosition.x, 
-        //     originalCameraPosition.y - cameraOffset, 
-        //     originalCameraPosition.z
-        // );
+        // Check for crouch toggle from keyboard or mobile
+        bool shouldToggleCrouch = Input.GetKeyDown(KeyCode.C) || Input.GetKeyDown(KeyCode.LeftControl);
+        
+        // Also check mobile controls
+        if (mobileControls != null && usingTouchControls)
+        {
+            if (mobileControls.IsCrouching() != isCrouching)
+            {
+                shouldToggleCrouch = true;
+            }
+        }
+        
+        if (shouldToggleCrouch)
+        {
+            isCrouching = !isCrouching;
+            targetHeight = isCrouching ? crouchHeight : originalHeight;
+        }
+        
+        // Smoothly transition height
+        currentHeight = Mathf.Lerp(currentHeight, targetHeight, crouchTransitionSpeed * Time.deltaTime);
+        
+        // Snap to target height if very close to complete the transition
+        if (Mathf.Abs(currentHeight - targetHeight) < 0.01f)
+        {
+            currentHeight = targetHeight;
+        }
+        
+        // Update controller height and center
+        controller.height = currentHeight;
+        controller.center = new Vector3(0, currentHeight / 2, 0);
+        
+        // Check for obstacles when standing up
+        if (!isCrouching && currentHeight < originalHeight)
+        {
+            if (Physics.Raycast(transform.position, Vector3.up, originalHeight))
+            {
+                // Don't stand up if there's an obstacle above
+                currentHeight = controller.height;
+                targetHeight = currentHeight;
+                isCrouching = true;
+            }
+        }
+        
+        // Calculate camera offset based on height difference
+        float heightDifference = originalHeight - currentHeight;
+        float cameraOffset = heightDifference / 2;
+        
+        // Update camera position
+        playerCamera.localPosition = new Vector3(
+            originalCameraPosition.x, 
+            originalCameraPosition.y - cameraOffset, 
+            originalCameraPosition.z
+        );
     }
 
     void LookAround()
     {
-        float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity;
-        float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity;
+        float mouseX = 0f;
+        float mouseY = 0f;
+        
+        // Get input based on platform
+        if (usingTouchControls && mobileControls != null)
+        {
+            // Only use right joystick for camera when it's not being used for movement
+            Vector2 lookInput = mobileControls.GetLookInput();
+            mouseX = lookInput.x * touchSensitivity * Time.deltaTime;
+            mouseY = lookInput.y * touchSensitivity * Time.deltaTime;
+        }
+        else
+        {
+            // Use mouse for desktop
+            mouseX = Input.GetAxis("Mouse X") * mouseSensitivity;
+            mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity;
+        }
 
         xRotation -= mouseY;
         xRotation = Mathf.Clamp(xRotation, -90f, 90f);
@@ -120,21 +167,37 @@ public class FPSController : MonoBehaviour
 
     void MovePlayer()
     {
-        float x = Input.GetAxis("Horizontal");
-        float z = Input.GetAxis("Vertical");
+        float x = 0f;
+        float z = 0f;
         
-        // Debug the input values
-        Debug.Log($"Input values: Horizontal = {x}, Vertical = {z}");
+        // Get input based on platform
+        if (usingTouchControls && mobileControls != null)
+        {
+            // Use the left joystick for movement on mobile
+            Vector2 movementInput = mobileControls.GetMovementInput();
+            x = movementInput.x;
+            z = movementInput.y;
+        }
+        else
+        {
+            // Use keyboard for desktop
+            x = Input.GetAxis("Horizontal");
+            z = Input.GetAxis("Vertical");
+        }
 
         Vector3 move = transform.right * x + transform.forward * z;
-        
-        // Debug the move vector before applying vertical speed
-        Debug.Log($"Move vector (before vertical): {move}");
 
         if (controller.isGrounded && verticalSpeed < 0)
             verticalSpeed = -2f;
 
-        if (Input.GetButtonDown("Jump") && controller.isGrounded)
+        // Handle jumping from keyboard or mobile
+        bool shouldJump = Input.GetButtonDown("Jump");
+        if (mobileControls != null && usingTouchControls)
+        {
+            shouldJump = shouldJump || mobileControls.GetJumpInput();
+        }
+        
+        if (shouldJump && controller.isGrounded)
             verticalSpeed = jumpForce;
 
         verticalSpeed += gravity * Time.deltaTime;
@@ -158,8 +221,5 @@ public class FPSController : MonoBehaviour
         
         // Move vertically
         controller.Move(verticalMove);
-        
-        // Debug the controller's state
-        Debug.Log($"isGrounded: {controller.isGrounded}, verticalSpeed: {verticalSpeed}, isSprinting: {isSprinting}, isCrouching: {isCrouching}");
     }
 }

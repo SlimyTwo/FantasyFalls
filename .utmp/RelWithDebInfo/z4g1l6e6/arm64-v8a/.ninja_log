@@ -1,0 +1,19 @@
+# ninja log v5
+26	1597	7670250633409080	GameActivity/CMakeFiles/game.dir/UGAEntry.cpp.o	d2ca676a9ee61d77
+20	1606	7670250633454191	GameActivity/CMakeFiles/game.dir/UGAInputKeyEvent.cpp.o	d615b71c90c9b9d4
+7	1703	7670250634450630	GameActivity/CMakeFiles/game.dir/UGADebug.cpp.o	2494f0bbd4a2d15e
+41	1638	7670250633838077	GameActivity/CMakeFiles/game.dir/UGAInputMotionEvent.cpp.o	1bc1799d13264b43
+50	1724	7670250634652256	GameActivity/CMakeFiles/game.dir/UGASoftKeyboard.cpp.o	2d7bb508b1982173
+13	1649	7670250633905149	GameActivity/CMakeFiles/game.dir/UGAConfiguration.cpp.o	177f6f8b9af00d00
+34	1905	7670250636512168	GameActivity/CMakeFiles/game.dir/UGAInput.cpp.o	16a8cae277968abe
+1	2071	7670250638096192	GameActivity/CMakeFiles/game.dir/UGAApplication.cpp.o	d0f9803539ade556
+2071	2215	7670250639616087	C:/Users/wildr/Desktop/FantasyFalls/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/RelWithDebInfo/z4g1l6e6/obj/arm64-v8a/libgame.so	fc9896de9fea6117
+8	1775	7676950612416418	GameActivity/CMakeFiles/game.dir/UGAEntry.cpp.o	d2ca676a9ee61d77
+33	1776	7676950612481952	GameActivity/CMakeFiles/game.dir/UGAInputKeyEvent.cpp.o	d615b71c90c9b9d4
+26	1778	7676950612775673	GameActivity/CMakeFiles/game.dir/UGAConfiguration.cpp.o	177f6f8b9af00d00
+47	1780	7676950612800812	GameActivity/CMakeFiles/game.dir/UGAInputMotionEvent.cpp.o	1bc1799d13264b43
+19	1841	7676950613432784	GameActivity/CMakeFiles/game.dir/UGADebug.cpp.o	2494f0bbd4a2d15e
+55	1843	7676950613465734	GameActivity/CMakeFiles/game.dir/UGASoftKeyboard.cpp.o	2d7bb508b1982173
+40	2011	7676950615135545	GameActivity/CMakeFiles/game.dir/UGAInput.cpp.o	16a8cae277968abe
+14	2115	7676950616110271	GameActivity/CMakeFiles/game.dir/UGAApplication.cpp.o	d0f9803539ade556
+2115	2233	7676950617363360	C:/Users/wildr/Desktop/FantasyFalls/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/RelWithDebInfo/z4g1l6e6/obj/arm64-v8a/libgame.so	fc9896de9fea6117

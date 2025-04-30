@@ -46,3 +46,17 @@ sysinfo.txt
 Icon?
 ehthumbs.db
 Thumbs.db
+
+ 
+# C++ related
+*.o
+*.obj
+*.a
+*.lib
+*.so
+*.dll
+*.dylib
+
+# Ninja build system
+.ninja_*
+build.ninja
